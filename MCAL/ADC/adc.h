@@ -2,31 +2,28 @@
  * adc.h
  *
  *  Created on: Jan 25, 2020
- *      Author: eng-m
+ *      Author: Ghanem
  */
 
 #ifndef MCAL_ADC_ADC_H_
 #define MCAL_ADC_ADC_H_
-/*
-typedef uint8 enum_adcInterruptMode_t;
-typedef uint8 enum_adcDataAdjut_t;
-typedef uint8 enum_adcVref_t;
-typedef uint8 enum_adcPrescaler_t;
-typedef uint8 enum_adcChannel_t;
-*/
+/************************************************************************/
+/*		                        Includes                 		        */
+/************************************************************************/
 #include "std_types.h"
+/************************************************************************/
+/*		                        Defines                 		        */
+/************************************************************************/
+#define ADC_POLLING 			(0U)
+#define ADC_INTERRUPT 			(1U)
 
 
-#define ADC_POLLING 		(0U)
-#define ADC_INTERRUPT 		(1U) /*adcsra*/
+#define ADC_RIGHT_ADGJUST 		(0U)
+#define ADC_LEFT_ADGJUST 		(1U)
 
-
-#define ADC_RIGHT_ADGJUST 	(0U)
-#define ADC_LEFT_ADGJUST 	(1U)
-
-#define ADC_VREF_INT		(0U)
-#define ADC_VREF_VCC		(1U)
-#define ADC_VREF_EXT		(2U)
+#define ADC_VREF_INT			(0U)
+#define ADC_VREF_VCC			(1U)
+#define ADC_VREF_EXT		    (2U)
 
 #define ADC_PRESCALER_2 		(0x01)
 #define ADC_PRESCALER_4			(0x02)
@@ -60,9 +57,11 @@ typedef uint8 enum_adcChannel_t;
 #define ADC_TIMER1_OV_TRIGG		(7U)
 #define ADC_TIMER1_ICP_TRIGG	(8U)
 
+/************************************************************************/
+/*		                     Explicit Types                		        */
+/************************************************************************/
 typedef struct
 {
-	uint8 u8_channelNo;
 	uint8 u8_refVoltage;
 	uint8 u8_dataAdjust;
 	uint8 u8_prescaler;
@@ -71,11 +70,47 @@ typedef struct
 	uint8 u8_autoTriggSource;/* single, free running or auto Trigger (set the required trigger )*/
 	ptr_Func_t ptr_ConvEnd_CBK;
 }str_adcCfg_t;
+/************************************************************************/
+/*		             External Functions  PROTOTYPES       		        */
+/************************************************************************/
+/*
+ * Function: Adc_init.
+ * Input: Pointer to a structure contains the needed information to initialize the ADC.
+ * Output:
+ * In/Out:
+ * Return: ERROR_Status each error code represent certain error to ease debugging.
+ * Description: Initiates the ADC module depending on the passed configuration structure.
+ */
+extern ERR_STATUS Adc_Init(str_adcCfg_t *str_adcCfg);
 
-ERR_STATUS Adc_Init(str_adcCfg_t *str_adcCfg);
-void Adc_Enable(void);
-ERR_STATUS Adc_StartConversion(uint8 u8_channelNumber);
-ERR_STATUS Adc_getConvertedValue(uint16 *pu16_convertedData);
-void Adc_Disable(void);
+/*
+ * Function: Adc_StartConversion.
+ * Input: u8_channelNumber -> channel number to set mux selector bits for specified channel.
+ *
+ * Return: ERROR_Status each error code represent certain error to ease debugging.
+ *
+ * Description: trigger the ADC module to start converting the analog data to digital.
+ */
+extern ERR_STATUS Adc_StartConversion(uint8 u8_channelNumber);
+
+/*
+ * Function: Adc_getConvertedValue.
+ * Input: *pu16_convertedData -> pointer to store the data in it.
+ * Output:
+ * In/Out:
+ * Return: ERROR_Status each error code represent certain error to ease debugging.
+ * Description: read the data from the ADCL and ADCH registers depending on the resolution and adjusment.
+ */
+extern ERR_STATUS Adc_getConvertedValue(uint16 *pu16_convertedData);
+
+/*
+ * Function: Adc_deinit.
+ *
+ * Return: ERROR_Status each error code represent certain error to ease debugging.
+ *
+ * Description: uninitialize the ADC as return the used register to their initial value also the used global variables.
+ */
+extern ERR_STATUS Adc_deinit(void);
+
 
 #endif /* MCAL_ADC_ADC_H_ */
